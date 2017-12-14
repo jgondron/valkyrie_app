@@ -17,7 +17,7 @@ Rails.application.config.to_prepare do
 
   # Metadata composite
   Valkyrie::MetadataAdapter.register(
-    Valkyrie::Persistence::CompositePersister.new(memory_meta.persister),
+    Valkyrie::Persistence::CompositePersister.new(memory_meta.persister, postgres_meta.persister),
     :composite_meta
   )
 
@@ -36,7 +36,7 @@ Rails.application.config.to_prepare do
 
   # Storage composite
   Valkyrie::MetadataAdapter.register(
-    Valkyrie::Persistence::CompositePersister.new(disk_storage, fedora_storage, memory_storage),
+    Valkyrie::Persistence::CompositePersister.new(disk_storage, memory_storage),
     :composite_storage
   )
 end
