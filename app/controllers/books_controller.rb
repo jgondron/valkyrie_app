@@ -10,18 +10,20 @@ class BooksController < ApplicationController
     render json: { in_memory: resources_to_json(resources: books_memory), in_postgres: resources_to_json(resources: books_postgres) }
   end
 
-  # curl --silent 'localhost:3000/books/5d54db6b-b521-4958-b5d6-fa88c0598184' | jq
+  # curl --silent 'localhost:3000/books/mybook' | jq
   def show
+    valk_id = Valkyrie::ID.new(params[:id])
+
     metadata_memory = Valkyrie::MetadataAdapter.find(:memory_meta)
-    book_memory = metadata_memory.query_service.find_by(id: Valkyrie::ID.new(params[:id]))
+    book_memory = metadata_memory.query_service.find_by(id: valk_id)
 
     metadata_postgres = Valkyrie::MetadataAdapter.find(:postgres_meta)
-    book_postgres = metadata_postgres.query_service.find_by(id: Valkyrie::ID.new(params[:id]))
+    book_postgres = metadata_postgres.query_service.find_by(id: valk_id)
 
     render json: { in_memory: resource_to_json(resource: book_memory), in_postgres: resource_to_json(resource: book_postgres) }
   end
 
-  # curl --silent -X POST -H 'Content-Type: application/json' -d '{ "id": "5d54db6b-b521-4958-b5d6-fa88c0598184", "title": ["abc"], "member_ids": [] }' 'localhost:3000/books' | jq
+  # curl --silent -X POST -H 'Content-Type: application/json' -d '{ "id": "mybook", "title": ["abc"], "member_ids": [] }' 'localhost:3000/books' | jq
   def create
     book = Book.new(persist_params)
     metadata_adapter = Valkyrie::MetadataAdapter.find(:composite_meta)
@@ -29,7 +31,7 @@ class BooksController < ApplicationController
     render json: resource_to_json(resource: book)
   end
 
-  # curl --silent -X PUT -H 'Content-Type: application/json' -d '{ "title": ["xyz"], "member_ids": [] }' 'localhost:3000/books/5d54db6b-b521-4958-b5d6-fa88c0598184' | jq
+  # curl --silent -X PUT -H 'Content-Type: application/json' -d '{ "title": ["xyz"], "member_ids": [] }' 'localhost:3000/books/mybook' | jq
   def update
     book = Book.new(persist_params)
     metadata_adapter = Valkyrie::MetadataAdapter.find(:composite_meta)
